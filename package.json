@@ -1,0 +1,18 @@
+{
+  "name": "twit",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Nana Adjei Manu <claeusdev@outlook.com> (https://nanamanu.xyz/)",
+  "license": "MIT",
+  "dependencies": {
+    "apollo-server": "2.7.0",
+    "graphql": "14.4.2",
+    "graphql-tag": "2.10.1",
+    "mongoose": "5.6.5"
+  }
+}
