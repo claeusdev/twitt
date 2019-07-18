@@ -1,8 +1,9 @@
 const User = require("../../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const {UserInputError} = require("apollo-server")
+const { UserInputError } = require("apollo-server");
 
+const { validateRegisterInput } = require("../../utils/validators");
 const { JwtSecret } = require("../../config");
 module.exports = {
   Mutation: {
@@ -12,15 +13,19 @@ module.exports = {
         registerInput: { username, email, password, confirmPassword }
       }
     ) {
+      const {valid, errors} = validateRegisterInput(username, email, password, confirmPassword)
 
-        const user = await User.findOne({ email })
-        if (user) {
-            throw new UserInputError("User already exist", {
-                errors: {
-                    email: "This user already exists"
-                }
-            })
-        }
+      if (!valid) {
+        throw new UserInputError("Errors", errors)
+      }
+      const user = await User.findOne({ email });
+      if (user) {
+        throw new UserInputError("User already exist", {
+          errors: {
+            email: "This user already exists"
+          }
+        });
+      }
       password = await bcrypt.hash(password, 11);
 
       const newUser = new User({
@@ -32,17 +37,21 @@ module.exports = {
       });
 
       const res = await newUser.save();
-      const token = jwt.sign({
-        id: res.id,
-        email: res.email,
-        username: res.username
-      }, JwtSecret,{expiresIn: "6h"});
+      const token = jwt.sign(
+        {
+          id: res.id,
+          email: res.email,
+          username: res.username
+        },
+        JwtSecret,
+        { expiresIn: "6h" }
+      );
 
       return {
-          ...res._doc,
-          id: res._id,
-          token
-      }
+        ...res._doc,
+        id: res._id,
+        token
+      };
     }
   }
 };
